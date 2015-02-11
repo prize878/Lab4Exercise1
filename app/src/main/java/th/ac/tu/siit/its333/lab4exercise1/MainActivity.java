@@ -22,6 +22,7 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        helper = new CourseDBHelper(this);
     }
 
     @Override
@@ -29,6 +30,30 @@ public class MainActivity extends ActionBarActivity {
         super.onResume();
 
         // This method is called when this activity is put foreground.
+
+        SQLiteDatabase db = helper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT SUM(credit) AS TotalCredit,SUM(credit*value) AS TGP FROM course;"
+                , null);
+
+        cursor.moveToFirst();
+
+        double tc = cursor.getDouble(cursor.getColumnIndex("TotalCredit"));
+        double tgp = cursor.getDouble(cursor.getColumnIndex("TGP"));
+
+
+            double gpa = 0;
+            if (tc > 0) {
+                gpa = tgp / tc;
+            }
+            TextView tvGP = (TextView) findViewById(R.id.tvGP);
+            TextView tvCR = (TextView) findViewById(R.id.tvCR);
+            TextView tvGPA = (TextView) findViewById(R.id.tvGPA);
+
+            tvGP.setText(String.format("%.2f", tgp));
+            tvCR.setText(String.format("%.0f", tc));
+            tvGPA.setText(String.format("%.2f", gpa));
+
+
 
     }
 
@@ -48,7 +73,10 @@ public class MainActivity extends ActionBarActivity {
                 break;
 
             case R.id.btReset:
-
+                //helper = new CourseDBHelper(this);
+                SQLiteDatabase db = helper.getWritableDatabase();
+                db.delete("course", "", null);
+                onResume();
                 break;
         }
     }
@@ -60,6 +88,20 @@ public class MainActivity extends ActionBarActivity {
                 String code = data.getStringExtra("code");
                 int credit = data.getIntExtra("credit", 0);
                 String grade = data.getStringExtra("grade");
+
+                helper = new CourseDBHelper(this);
+                SQLiteDatabase dbw = helper.getWritableDatabase();
+                ContentValues ri = new ContentValues();
+                ri.put("code",code);
+                ri.put("credit",credit);
+                ri.put("grade", grade);
+                ri.put("value", gradeToValue(grade));
+                long new_id = dbw.insert("course", null, ri);
+
+                Log.d("GPA",new_id + "");
+                Log.d("GPA",code + "");
+                Log.d("GPA",credit + "");
+                Log.d("GPA",grade + "");
 
             }
         }
@@ -107,4 +149,5 @@ public class MainActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 }

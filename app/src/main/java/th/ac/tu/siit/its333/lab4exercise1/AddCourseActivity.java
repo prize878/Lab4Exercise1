@@ -3,9 +3,11 @@ package th.ac.tu.siit.its333.lab4exercise1;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -45,6 +47,7 @@ public class AddCourseActivity extends ActionBarActivity {
             this.finish();
         }
     }
+
 
 
     @Override
